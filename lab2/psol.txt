@@ -1,0 +1,6 @@
+Verbosity leads to unclear, inarticulate things.
+1 2 3 1 2 3
+1 577
+8
+mpmeka
+710
