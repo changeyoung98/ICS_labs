@@ -1,0 +1,32 @@
+#Chen Zhiyang
+#516030910347
+
+main:
+   irmovq $0x500,%rsp
+   irmovq ele1, %rdi
+   call rsum_list
+   halt
+rsum_list:
+   pushq %rbx
+   mrmovq (%rdi), %rbx
+   irmovq $0x0,%rax
+   andq %rdi, %rdi
+   je finish
+   mrmovq 8(%rdi), %rdi
+   call rsum_list
+   addq %rbx, %rax
+finish:
+   popq %rbx
+   ret
+
+.align 8
+ele1:
+    .quad 0x00a
+    .quad ele2
+ele2:
+    .quad 0x0b0
+    .quad ele3
+ele3:
+    .quad 0xc00
+    .quad 0
+

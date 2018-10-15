@@ -1,0 +1,195 @@
+ncopy:
+
+##################################################################
+# You can modify this portion
+        irmovq $0,%rax          # count = 0;
+       # andq %rdx,%rdx
+       # je Done
+        iaddq $-16,%rdx
+        andq %rdx,%rdx          # len <= 0?
+        jl Less                # if so, goto Loop:
+
+Loop1:   mrmovq 120(%rdi), %r10 # read val from src...
+       # mrmovq 112(%rdi), %r9     # read val from src...
+       # mrmovq 104(%rdi), %r8     # read val from src...
+        andq %r10, %r10         # val <= 0?
+        rmmovq %r10, 120(%rsi)     # ...and store it to dst
+       # mrmovq 96(%rdi), %r11     # read val from src...
+        jle Loop2               # if so, goto Npos:
+        iaddq $1, %rax          # count++
+Loop2:  mrmovq 112(%rdi), %r9     # read val from src...
+        andq %r9, %r9         # val <= 0?
+        rmmovq %r9, 112(%rsi)     # ...and store it to dst
+        jle Loop3                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+Loop3:  mrmovq 104(%rdi), %r8     # read val from src...
+        andq %r8, %r8         # val <= 0?
+        rmmovq %r8, 104(%rsi)     # ...and store it to dst
+        jle Loop4               # if so, goto Npos:
+        iaddq $1, %rax          # count++
+Loop4:  mrmovq 96(%rdi), %r11     # read val from src...
+        andq %r11, %r11         # val <= 0?
+        rmmovq %r11, 96(%rsi)     # ...and store it to dst
+        jle Loop5                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+Loop5:   mrmovq 88(%rdi), %r8     # read val from src...
+       # mrmovq 80(%rdi), %r9     # read val from src...
+        #  mrmovq 72(%rdi), %r10     # read val from src...
+       # iaddq $16, %rdi         # src++  #mov from else where
+        andq %r8, %r8         # val <= 0?
+        rmmovq %r8, 88(%rsi)     # ...and store it to dst
+       # mrmovq 64(%rdi), %r11     # read val from src...
+        jle Loop6               # if so, goto Npos:
+        iaddq $1, %rax          # count++
+Loop6:  mrmovq 80(%rdi), %r9     # read val from src...
+        andq %r9, %r9         # val <= 0?
+        rmmovq %r9, 80(%rsi)     # ...and store it to dst
+        jle Loop7                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+Loop7:   mrmovq 72(%rdi), %r10     # read val from src...
+        #iaddq $16, %rdi         # src++  #mov from else where
+        andq %r10, %r10         # val <= 0?
+        rmmovq %r10, 72(%rsi)     # ...and store it to dst
+        jle Loop8               # if so, goto Npos:
+        iaddq $1, %rax          # count++
+Loop8:  mrmovq 64(%rdi), %r11     # read val from src...
+        andq %r11, %r11         # val <= 0?
+        rmmovq %r11, 64(%rsi)     # ...and store it to dst
+        jle Npos                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+#Loop9:   mrmovq 56(%rdi), %r8     # read val from src...
+       # mrmovq 48(%rdi), %r9     # read val from src...
+       #   mrmovq 40(%rdi), %r10     # read val from src...
+       # iaddq $16, %rdi         # src++  #mov from else where
+ #       andq %r8, %r8         # val <= 0?
+  #      rmmovq %r8, 56(%rsi)     # ...and store it to dst
+      # mrmovq 32(%rdi), %r11     # read val from src...
+   #     jle Loop10               # if so, goto Npos:mrmovq 64(%rdi), %r11     # read val from src...
+    #    iaddq $1, %rax          # count++
+#Loop10: mrmovq 48(%rdi), %r9     # read val from src...
+ #       andq %r9, %r9         # val <= 0?
+  #      rmmovq %r9, 48(%rsi)     # ...and store it to dst
+   #     jle Loop11                # if so, goto Npos:
+    #    iaddq $1, %rax         # count++
+#Loop11: mrmovq 40(%rdi), %r10     # read val from src...
+ #       #iaddq $16, %rdi         # src++  #mov from else where
+  #      andq %r10, %r10         # val <= 0?
+   #     rmmovq %r10, 40(%rsi)     # ...and store it to dst
+    #    jle Loop12               # if so, goto Npos:
+     #   iaddq $1, %rax          # count++
+#Loop12: mrmovq 32(%rdi), %r11     # read val from src...
+ #       andq %r11, %r11         # val <= 0?
+  #      rmmovq %r11, 32(%rsi)     # ...and store it to dst
+   #     jle Loop13                # if so, goto Npos:
+    #    iaddq $1, %rax         # count++
+#Loop13:   mrmovq 24(%rdi), %r8     # read val from src...
+       # mrmovq 16(%rdi), %r9     # read val from src...
+       #   mrmovq 8(%rdi), %r10     # read val from src...
+       # iaddq $16, %rdi         # src++  #mov from else where
+ #       andq %r8, %r8         # val <= 0?
+  #      rmmovq %r8, 24(%rsi)     # ...and store it to dst
+       # mrmovq (%rdi), %r11     # read val from src...
+   #     jle Loop14               # if so, goto Npos:
+    #    iaddq $1, %rax          # count++
+#Loop14: mrmovq 16(%rdi), %r9     # read val from src...
+ #       andq %r9, %r9         # val <= 0?
+  #      rmmovq %r9, 16(%rsi)     # ...and store it to dst
+   #     jle Loop15                # if so, goto Npos:
+    #    iaddq $1, %rax         # count++
+#Loop15: mrmovq 8(%rdi), %r10     # read val from src...
+ #       #iaddq $16, %rdi         # src++  #mov from else where
+  #      andq %r10, %r10         # val <= 0?
+   #     rmmovq %r10, 8(%rsi)     # ...and store it to dst
+    #    jle Loop16               # if so, goto Npos:
+     #   iaddq $1, %rax          # count++
+#Loop16: mrmovq (%rdi), %r11     # read val from src...
+ #       andq %r11, %r11         # val <= 0?
+  #      rmmovq %r11, (%rsi)     # ...and store it to dst
+   #     jle Npos                # if so, goto Npos:
+    #    iaddq $1, %rax         # count++
+
+Npos:   
+        iaddq $64, %rdi
+        iaddq $64, %rsi         # dst++ #move from that
+
+        iaddq $-8,%rdx
+        andq %rdx,%rdx          # len <= 0?
+        jg Loop1                # if so, goto Loop:
+Less:   addq %rdx,%rdx
+        addq %rdx,%rdx
+        addq %rdx,%rdx
+        mrmovq JT(%rdx),%rdx
+        pushq %rdx
+        ret
+T0:     mrmovq 56(%rdi), %r10
+        andq %r10,%r10
+        rmmovq %r10, 56(%rsi)
+        jle T1
+        iaddq $1, %rax
+
+T1:     mrmovq 48(%rdi), %r10
+        andq %r10,%r10
+        rmmovq %r10, 48(%rsi)
+        jle T2
+        iaddq $1, %rax
+T2:     mrmovq 40(%rdi),%r10
+        andq %r10,%r10
+        rmmovq %r10, 40(%rsi)
+        jle T3
+        iaddq $1, %rax
+T3:     mrmovq 32(%rdi), %r10
+        andq %r10,%r10
+        rmmovq %r10, 32(%rsi)
+        jle T4
+        iaddq $1, %rax
+T4:     mrmovq 24(%rdi), %r10
+        andq %r10,%r10
+        rmmovq %r10, 24(%rsi)
+        jle T5
+        iaddq $1, %rax
+T5:     mrmovq 16(%rdi), %r10
+        andq %r10,%r10
+        rmmovq %r10, 16(%rsi)
+        jle T6
+        iaddq $1, %rax
+T6:     mrmovq 8(%rdi), %r10
+        andq %r10,%r10
+        rmmovq %r10, 8(%rsi)
+        jle T7
+        iaddq $1, %rax
+T7:     mrmovq (%rdi), %r10
+        andq %r10,%r10
+        rmmovq %r10, (%rsi)
+        jle Done
+        iaddq $1, %rax
+#
+
+.align 8
+  #   .quad Done
+ #    .quad Loop16
+    # .quad Loop15
+   #  .quad Loop14
+  #   .quad Loop13
+ #    .quad Loop12
+#     .quad Loop11
+ #    .quad Loop10
+#     .quad Loop9
+#     .quad T8
+     .quad T7
+     .quad T6
+     .quad T5
+     .quad T4
+     .quad T3
+     .quad T2
+     .quad T1
+JT:  .quad T0
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+        ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */
+   

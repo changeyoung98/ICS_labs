@@ -1,0 +1,175 @@
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len words to dst.
+# Return the number of positive words (>0) contained in src.
+#
+# Include your name and ID here.
+#Chen Zhiyang 516030910347
+# Describe how and why you modified the baseline code.
+#1.Use loop unrolling by a step of 10 to both improve CPE and satisfy the limit of bytes
+#2.Use jump table to deal with the rest(I tried to reuse the codes in loop , but some instructions can't be reduced)
+#3.Move the check for 0 at the header to jump table to achieve better average score(in this way, though there are more cycles for 0,cycles for others are reduced) 
+#4.In the loops, rearrange the mrmovq(put several together) to reduce load/use penalty
+#5.Use new function iaddq to reduce cycles
+#6.Rearrange conditional jumps to jump more correctly
+#7.Change HCL code so that the combinaton of andq and jle cause no bubble
+##################################################################
+# Do not modify this portion
+# Function prologue.
+# %rdi = src, %rsi = dst, %rdx = len
+ncopy:
+
+##################################################################
+# You can modify this portion
+         xorq %rax,%rax  
+         iaddq $-10,%rdx
+        #andq %rdx,%rdx          # len <= 0?
+         jl Less                # if so, goto Loop:
+
+Loop7:   mrmovq 72(%rdi), %r10     # read val from src...
+        mrmovq 64(%rdi), %r11
+        mrmovq 56(%rdi), %r8
+        rmmovq %r10, 72(%rsi)     # ...and store it to dst
+        andq %r10, %r10
+        jle Loop8               # if so, goto Npos:
+        iaddq $1, %rax          # count++ 
+Loop8: # mrmovq 64(%rdi), %r11     # read val from src...
+        rmmovq %r11, 64(%rsi)     # ...and store it to dst
+        andq %r11, %r11         # val <= 0?
+        jle Loop9                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+Loop9:  # mrmovq 56(%rdi), %r8     # read val from src...
+        mrmovq 48(%rdi), %r9     # read val from src...
+        mrmovq 40(%rdi), %r10     # read val from src...
+        rmmovq %r8, 56(%rsi)     # ...and store it to dst
+        mrmovq 32(%rdi), %r11     # read val from src...
+        andq %r8, %r8         # val <= 0?
+        jle Loop10               # if so, goto
+        iaddq $1, %rax          # count++
+Loop10:# mrmovq 48(%rdi), %r9     # read val from src...
+        rmmovq %r9, 48(%rsi)     # ...and store it to dst
+        andq %r9, %r9         # val <= 0?
+        jle Loop11                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+Loop11: #mrmovq 40(%rdi), %r10     # read val from src...
+        #iaddq $16, %rdi         # src++  #mov from else where
+        rmmovq %r10, 40(%rsi)     # ...and store it to dst
+        andq %r10, %r10         # val <= 0?
+        jle Loop12               # if so, goto Npos:
+        iaddq $1, %rax          # count++
+Loop12: #mrmovq 32(%rdi), %r11     # read val from src...
+        rmmovq %r11, 32(%rsi)     # ...and store it to dst
+        andq %r11, %r11         # val <= 0?
+        jle Loop13                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+Loop13:   mrmovq 24(%rdi), %r8     # read val from src...
+        mrmovq 16(%rdi), %r9     # read val  from src...
+          mrmovq 8(%rdi), %r10     # read val from src...
+       # iaddq $16, %rdi         # src++  #mov from else where
+        rmmovq %r8, 24(%rsi)     # ...and store it to dst
+        mrmovq (%rdi), %r11     # read val from src...
+        andq %r8, %r8         # val <= 0?
+        jle Loop14               # if so, goto Npos:
+        iaddq $1, %rax          # count++
+Loop14:# mrmovq 16(%rdi), %r9     # read val from src... 
+        rmmovq %r9, 16(%rsi)     # ...and store it to dst
+        andq %r9, %r9         # val <= 0?
+        jle Loop15                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+Loop15: #mrmovq 8(%rdi), %r10     # read val from src...
+        #iaddq $16, %rdi         # src++  #mov from else where
+        rmmovq %r10, 8(%rsi)     # ...and store it to dst
+        andq %r10, %r10         # val <= 0?
+        jle Loop16               # if so, goto Npos:
+        iaddq $1, %rax          # count++
+Loop16: #mrmovq (%rdi), %r11     # read val from src...
+        rmmovq %r11, (%rsi)     # ...and store it to dst
+        andq %r11, %r11         # val <= 0?
+        jle Npos                # if so, goto Npos:
+        iaddq $1, %rax         # count++
+
+Npos:  
+        iaddq $80, %rdi
+        iaddq $80, %rsi         # dst++ #move from that
+
+        iaddq $-10,%rdx
+        #andq %rdx,%rdx          # len <= 0?
+        jge Loop7                # if so, goto Loop:
+Less:   addq %rdx,%rdx
+        addq %rdx,%rdx
+        addq %rdx,%rdx
+        mrmovq JT(%rdx),%rdx
+        pushq %rdx
+        ret
+T000:
+
+T00:    mrmovq 64(%rdi), %r10
+        rmmovq %r10, 64(%rsi)
+        andq %r10,%r10
+        jle T0
+        iaddq $1, %rax
+
+T0:     mrmovq 56(%rdi), %r10
+        rmmovq %r10, 56(%rsi)
+        andq %r10,%r10
+        jle T1
+        iaddq $1, %rax
+        
+T1:     mrmovq 48(%rdi), %r10
+        rmmovq %r10, 48(%rsi)
+        andq %r10,%r10
+        jle T2
+        iaddq $1, %rax
+T2:     mrmovq 40(%rdi),%r10
+        rmmovq %r10, 40(%rsi)
+        andq %r10,%r10
+        jle T3
+        iaddq $1, %rax 
+T3:     mrmovq 32(%rdi), %r10
+        rmmovq %r10, 32(%rsi)
+        andq %r10,%r10
+        jle T4
+        iaddq $1, %rax
+T4:     mrmovq 24(%rdi), %r10
+        rmmovq %r10, 24(%rsi)
+        andq %r10,%r10
+        jle T5
+        iaddq $1, %rax
+T5:     mrmovq 16(%rdi), %r9
+        rmmovq %r9, 16(%rsi)
+        andq %r9,%r9
+        jle T6
+        iaddq $1, %rax
+T6:     mrmovq 8(%rdi), %r10
+        rmmovq %r10, 8(%rsi)
+        andq %r10,%r10
+        jle T7
+        iaddq $1, %rax
+T7:     mrmovq (%rdi), %r10
+        rmmovq %r10, (%rsi)
+        andq %r10,%r10
+        jle Done
+        iaddq $1, %rax
+        jmp Done
+
+.align 8
+     .quad Done
+     .quad T7
+     .quad T6
+     .quad T5
+     .quad T4
+     .quad T3
+     .quad T2
+     .quad T1
+     .quad T0
+     .quad T00
+JT:  .quad Done
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+	ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */

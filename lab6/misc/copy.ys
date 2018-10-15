@@ -1,0 +1,37 @@
+#Chen Zhiyang
+#516030910347
+
+main:
+   irmovq $0x500,%rsp
+   irmovq src, %rdi
+   irmovq dest, %rsi
+   irmovq $0x3, %rdx
+   call copy_block
+   halt
+copy_block:
+   irmovq $0x0,%rax
+   irmovq $0x1,%rcx
+   irmovq $0x8,%r8
+loop:
+   andq %rdx, %rdx
+   je finish
+   mrmovq (%rdi), %rbx
+   rmmovq %rbx,(%rsi)
+   xorq %rbx, %rax
+   subq %rcx, %rdx
+   addq %r8, %rdi
+   addq %r8, %rsi
+   jmp loop
+finish:
+   ret
+
+.align 8
+src:
+    .quad 0x00a
+    .quad 0x0b0
+    .quad 0xc00
+
+dest:
+    .quad 0x111
+    .quad 0x222
+    .quad 0x333

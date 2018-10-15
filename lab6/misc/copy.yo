@@ -1,0 +1,44 @@
+                            | #Chen Zhiyang
+                            | #516030910347
+                            | 
+0x000:                      | main:
+0x000: 30f40005000000000000 |    irmovq $0x500,%rsp
+0x00a: 30f78800000000000000 |    irmovq src, %rdi
+0x014: 30f6a000000000000000 |    irmovq dest, %rsi
+0x01e: 30f20300000000000000 |    irmovq $0x3, %rdx
+0x028: 803500000000000000   |    call copy_block
+0x031: 10                   |    nop
+0x032: 10                   |    nop
+0x033: 10                   |    nop
+0x034: 00                   |    halt
+0x035:                      | copy_block:
+0x035: 30f00000000000000000 |    irmovq $0x0,%rax
+0x03f: 30f10100000000000000 |    irmovq $0x1,%rcx
+0x049: 30f80800000000000000 |    irmovq $0x8,%r8
+0x053:                      | loop:
+0x053: 6222                 |    andq %rdx, %rdx
+0x055: 738300000000000000   |    je finish
+0x05e: 50370000000000000000 |    mrmovq (%rdi), %rbx
+0x068: 40360000000000000000 |    rmmovq %rbx,(%rsi)
+0x072: 6330                 |    xorq %rbx, %rax
+0x074: 6112                 |    subq %rcx, %rdx
+0x076: 6087                 |    addq %r8, %rdi
+0x078: 6086                 |    addq %r8, %rsi
+0x07a: 705300000000000000   |    jmp loop
+0x083:                      | finish:
+0x083: 90                   |    ret
+0x084: 10                   |    nop
+0x085: 10                   |    nop
+0x086: 10                   |    nop
+                            | 
+                            | 
+0x088:                      | .align 8
+0x088:                      | src:
+0x088: 0a00000000000000     |     .quad 0x00a
+0x090: b000000000000000     |     .quad 0x0b0
+0x098: 000c000000000000     |     .quad 0xc00
+                            | 
+0x0a0:                      | dest:
+0x0a0: 1101000000000000     |     .quad 0x111
+0x0a8: 2202000000000000     |     .quad 0x222
+0x0b0: 3303000000000000     |     .quad 0x333
